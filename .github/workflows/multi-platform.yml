@@ -45,5 +45,5 @@ jobs:
         id: build
       - uses: actions/upload-artifact@v4
         with:
-          name: Auto-Decorator-Builds
+          name: Auto-Decorator-Geode-Mods
           path: ${{ steps.build.outputs.build-output }}
