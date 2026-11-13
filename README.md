@@ -28,7 +28,7 @@ geode sdk install-binaries -p android64
 geode build -p android64
 ```
 
-The GitHub Actions workflow builds the configured platform targets and uploads the resulting packages as an artifact.
+The GitHub Actions workflow builds Geode mod packages (`.geode`) for the configured platform targets and uploads them as an artifact. This project does **not** build or distribute an Android APK. On Android, install the `.geode` file using Geode's mod installation flow.
 
 ## Status
 
