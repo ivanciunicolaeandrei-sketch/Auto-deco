@@ -1,0 +1,14 @@
+{
+  "geode": "v5.10.1",
+  "gd": {
+    "win": "2.2081",
+    "android": "2.2081",
+    "mac": "2.2081",
+    "ios": "2.2081"
+  },
+  "id": "ivanciunicolae.autodeco",
+  "name": "Auto Decorator",
+  "version": "v0.1.0",
+  "developer": "ivanciunicolaeandrei-sketch",
+  "description": "One-button level styling presets and a local decoration-style scanner."
+}
