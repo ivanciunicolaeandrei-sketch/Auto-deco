@@ -29,7 +29,10 @@ namespace {
     constexpr size_t PRESET_COUNT = sizeof(PRESETS) / sizeof(PRESETS[0]);
 
     size_t selectedPreset() {
-        return Mod::get()->getSavedValue<int>("selected-preset", 0) % PRESET_COUNT;
+        // Clamp saved data before converting to size_t so a corrupted or
+        // negative setting can never produce an invalid PRESETS index.
+        auto saved = Mod::get()->getSavedValue<int>("selected-preset", 0);
+        return static_cast<size_t>(std::clamp(saved, 0, static_cast<int>(PRESET_COUNT) - 1));
     }
 
     int intensityFor(size_t index) {
@@ -124,7 +127,10 @@ namespace {
         auto index = selectedPreset();
         auto intensity = intensityFor(index);
         auto glow = glowFor(index);
-        auto slot = Mod::get()->getSavedValue<int>("custom-preset-count", 0) + 1;
+        auto slot = std::clamp(
+            Mod::get()->getSavedValue<int>("custom-preset-count", 0) + 1,
+            1, 999
+        );
         Mod::get()->setSavedValue<int>("custom-preset-count", slot);
         Mod::get()->setSavedValue<int>("custom-" + std::to_string(slot) + "-intensity", intensity);
         Mod::get()->setSavedValue<bool>("custom-" + std::to_string(slot) + "-glow", glow);
