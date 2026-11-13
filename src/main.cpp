@@ -142,12 +142,62 @@ namespace {
         );
     }
 
+    void showPreviewMenu() {
+        auto index = selectedPreset();
+        auto const& preset = PRESETS[index];
+        auto intensity = intensityFor(index);
+        auto glow = glowFor(index);
+        auto sensitivity = Mod::get()->getSavedValue<int>("sensitivity", 50);
+
+        static constexpr char const* PALETTES[] = {
+            "Crimson / ember / charcoal",
+            "White / ice blue / silver",
+            "Deep blue / cyan / seafoam",
+            "Violet / lavender / crystal",
+            "Black / white / gray",
+            "Forest green / leaf / lime",
+            "Neon pink / electric blue / black",
+            "Magenta / cyan / midnight",
+            "Steel / copper / graphite",
+            "Amber / orange / dusk"
+        };
+
+        createQuickPopup(
+            "BEFORE / AFTER PREVIEW",
+            fmt::format(
+                "CURRENT LEVEL\nYour original level remains unchanged.\n\n"
+                "DECORATION PLAN\nPreset: {}\nPalette: {}\nIntensity: {}%\nGlow: {}\nSensitivity: {}%\n\n"
+                "This is a settings preview, not a rendered level screenshot. Actual object placement and a live before/after renderer are not connected yet.",
+                preset.name, PALETTES[index], intensity, glow ? "ON" : "OFF", sensitivity
+            ),
+            "Back",
+            "Smart plan",
+            [](FLAlertLayer*, bool makePlan) {
+                if (makePlan) showScanMenu();
+                else showMainMenu();
+            }
+        );
+    }
+
     void showScanMenu() {
         auto index = selectedPreset();
+        auto const& preset = PRESETS[index];
+        auto intensity = intensityFor(index);
+        auto glow = glowFor(index);
+        auto sensitivity = Mod::get()->getSavedValue<int>("sensitivity", 50);
+
         createQuickPopup(
-            "LEVEL STYLE SCAN",
-            fmt::format("Selected reference style: {}\n\nThe level scanner interface is ready to be connected, but this build does not yet inspect editor objects or generate a style automatically. No level objects have been changed.", PRESETS[index].name),
-            "OK"
+            "SMART DECORATION PLAN",
+            fmt::format(
+                "Proposed style: {}\nIntensity: {}%\nGlow: {}\nSensitivity: {}%\n\n"
+                "The planner can prepare a style configuration, but this version does not yet inspect or modify editor objects. Your level is safe and unchanged. The next implementation step is object scanning, generated placement, and a real rendered preview.",
+                preset.name, intensity, glow ? "ON" : "OFF", sensitivity
+            ),
+            "Preview",
+            "OK",
+            [](FLAlertLayer*, bool preview) {
+                if (preview) showPreviewMenu();
+            }
         );
     }
 
@@ -155,7 +205,7 @@ namespace {
         createQuickPopup(
             "AUTO DECORATOR TOOLS",
             "Choose a tool. Settings are saved on this device.",
-            "Scan level",
+            "Smart Decorate",
             "Settings",
             [](FLAlertLayer*, bool settings) {
                 if (settings) {
@@ -194,7 +244,7 @@ namespace {
                         }
                     );
                 } else {
-                    showScanMenu();
+                    showPreviewMenu();
                 }
             }
         );
