@@ -1,4 +1,6 @@
 #include <Geode/Geode.hpp>
+#include <algorithm>
+#include <string>
 #include <Geode/modify/EditorUI.hpp>
 
 using namespace geode::prelude;
@@ -87,6 +89,22 @@ namespace {
         );
     }
 
+    void showIntensityMenu() {
+        auto index = selectedPreset();
+        auto value = intensityFor(index);
+        createQuickPopup(
+            "PRESET INTENSITY",
+            fmt::format("{} intensity is {}%. Adjust it in 5% steps.", PRESETS[index].name, value),
+            "Decrease",
+            "Increase",
+            [index, value](FLAlertLayer*, bool increase) {
+                auto next = std::clamp(value + (increase ? 5 : -5), 0, 100);
+                saveIntensity(index, next);
+                createQuickPopup("INTENSITY SAVED", fmt::format("{} intensity is now {}%.", PRESETS[index].name, next), "OK");
+            }
+        );
+    }
+
     void showGlowMenu() {
         auto index = selectedPreset();
         auto enabled = glowFor(index);
@@ -139,10 +157,34 @@ namespace {
                         "PRESET SETTINGS",
                         "Choose what to configure.",
                         "Sensitivity",
-                        "Glow",
-                        [](FLAlertLayer*, bool glow) {
-                            if (glow) showGlowMenu();
-                            else showSensitivityMenu();
+                        "More",
+                        [](FLAlertLayer*, bool more) {
+                            if (!more) {
+                                showSensitivityMenu();
+                                return;
+                            }
+                            createQuickPopup(
+                                "MORE SETTINGS",
+                                "Each preset stores its own intensity and glow preference.",
+                                "Intensity",
+                                "Other",
+                                [](FLAlertLayer*, bool other) {
+                                    if (!other) {
+                                        showIntensityMenu();
+                                        return;
+                                    }
+                                    createQuickPopup(
+                                        "PRESET EXTRAS",
+                                        "Choose an extra action.",
+                                        "Glow",
+                                        "Save preset",
+                                        [](FLAlertLayer*, bool save) {
+                                            if (save) showCustomPresetMenu();
+                                            else showGlowMenu();
+                                        }
+                                    );
+                                }
+                            );
                         }
                     );
                 } else {
@@ -197,10 +239,12 @@ class $modify(AutoDecoratorEditorUI, EditorUI) {
         if (!icon) {
             icon = CCSprite::createWithSpriteFrameName("GJ_plus2Btn_001.png");
         }
-        if (icon) {
-            icon->setColor({255, 45, 45});
-            icon->setScale(0.78f);
+        if (!icon) {
+            icon = CCSprite::create();
+            icon->setContentSize({32.f, 32.f});
         }
+        icon->setColor({255, 45, 45});
+        icon->setScale(0.78f);
 
         auto button = CCMenuItemSpriteExtra::create(
             icon,
