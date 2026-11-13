@@ -76,6 +76,7 @@ namespace {
     }
 
     void showMainMenu();
+    void showScanMenu();
 
     void showSensitivityMenu() {
         auto sensitivity = Mod::get()->getSavedValue<int>("sensitivity", 50);
